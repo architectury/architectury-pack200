@@ -1,0 +1,58 @@
+plugins {
+    id "java"
+    id "idea"
+    id "eclipse"
+    id "maven-publish"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "org.cadixdev.licenser" version "0.6.1"
+}
+
+group "dev.architectury"
+
+def runNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "9999"
+
+version = base_version + "." + runNumber
+
+logger.lifecycle(":building architectury pack200 v${version}")
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = 16
+}
+
+repositories {
+    maven { url "https://maven.architectury.dev/" }
+    mavenCentral()
+}
+
+sourceSets {
+    loomStub
+    main.compileClasspath += loomStub.output
+}
+
+dependencies {
+}
+
+java {
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        main(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        if (System.getenv("MAVEN_PASS") != null) {
+            maven {
+                url = "https://deploy.shedaniel.me/"
+                credentials {
+                    username = "shedaniel"
+                    password = System.getenv("MAVEN_PASS")
+                }
+            }
+        }
+    }
+}

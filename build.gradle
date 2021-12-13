@@ -3,7 +3,7 @@ plugins {
     id "idea"
     id "eclipse"
     id "maven-publish"
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "java-gradle-plugin"
     id "org.cadixdev.licenser" version "0.6.1"
 }
 
@@ -22,6 +22,7 @@ tasks.withType(JavaCompile).configureEach {
 
 repositories {
     maven { url "https://maven.architectury.dev/" }
+    gradlePluginPortal()
     mavenCentral()
 }
 
@@ -31,6 +32,16 @@ sourceSets {
 }
 
 dependencies {
+    implementation gradleApi()
+}
+
+gradlePlugin {
+    plugins {
+        architect {
+            id = "dev.architectury.architectury-pack200"
+            implementationClass = "dev.architectury.pack200.java.Pack200Plugin"
+        }
+    }
 }
 
 java {
